@@ -6,7 +6,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sa
 %       proceed with user input.
 % INPUTS:
 %   filepath = char
-%       the path to a .mat file containing the variable `data` (2xn double)
+%       the path to a .mat file containing the variable `data` (1xn double)
 %   ch_height = double [um]
 %       channel height measured from the SU-8 wafer
 %   De_np = double [um]
@@ -23,18 +23,16 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sa
 
     % load data
     load(filepath,'data');
-    if size(data,1)==2 && size(data,2)>2
-        data = data(2,:); % only keep the voltage info (not the timestamps)
-    else
-        error('the variable `data` in filepath must be a 2xn array of doubles');
+    if ~( size(data,1)==1 && size(data,2)>2 )
+        error('the variable `data` in filepath must be a 1xn array of doubles');
     end
 
     % apply default parameters, if not supplied
-    if nargin < 3
+    if nargin < 5
         sampleRate = 50000;
         fprintf('default sample rate used: %d Hz\n', sampleRate);
     end
-    if nargin < 2 || isempty(thresholds)
+    if nargin < 4 || isempty(thresholds)
         thresholds = [1e-4, 1e-3];
         fprintf('Auto thresholds set to %3.2e, %3.2e\n',thresholds);
     end
