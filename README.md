@@ -1,13 +1,13 @@
 # NPS-analysis-JOVE
 
 ### mechano-NPS data analysis for the JOVE protocol paper
-adapted from NPS-analysis-chondrocytes
+adapted from NPS-analysis-chondrocytes  
 *copyright 2022 Kristen Cotner, Brian Li*
 
 Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes with mechano-node-pore sensing. *Microsyst Nanoeng* **4**, 17091 (2018). https://doi.org/10.1038/micronano.2017.91
 
 #### example: data processing
-`>> output_table = mNPS_procChon(filepath, ch_height, De_np, thresholds, sampleRate);`  
+`>> output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sampleRate);`  
 `>> disp(output_table);`  
 `>> summary(output_table);`  
 `>> histogram(output_table.wCDI);`  
@@ -18,20 +18,26 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 `>> [y_smoothed, y_downsampled] = mNPS_fastQC(data)`  
 `>> plot(y_downsampled)`
 
+### updates 06.17.2022 (adapting for JOVE devices)
+* renamed functions
+	* `mNPS_procChon()` is now `mNPS_procJOVE()`
+	* `mNPS_readChon()` is now `mNPS_readJOVE()`
+* adjusted hard-coded device parameters in `mNPS_readJOVE.m`
+
 ### updates 04.30.2020
 * inputs & outputs for processing functions
-	* converted output of `mNPS_procChon()` to a table with column names & information
-	* sample rate must be passed as an argument to `mNPS_procChon()`
-	* wafer height & effective diameter must be passed as arguments to `mNPS_readChon()` and `mNPS_procChon()`
+	* converted output of `mNPS_procJOVE()` to a table with column names & information
+	* sample rate must be passed as an argument to `mNPS_procJOVE()`
+	* wafer height & effective diameter must be passed as arguments to `mNPS_readJOVE()` and `mNPS_procJOVE()`
 * calculating recovery time & category
-	* added recovery category to output of `mNPS_readChon()` and `mNPS_procChon()`
-	* fixed bug in recovery time calculation in `mNPS_readChon()`
-	* `mNPS_readChon()` now calculates recovery time & category based on 3 recovery segments
+	* added recovery category to output of `mNPS_readJOVE()` and `mNPS_procJOVE()`
+	* fixed bug in recovery time calculation in `mNPS_readJOVE()`
+	* `mNPS_readJOVE()` now calculates recovery time & category based on 3 recovery segments
 	* an actual recovery time is now calculated for cells with "instant" recovery
 * fixed arguments & outputs in `mNPS_fastQC()`
 * removed duplicate & unused functions
 
-### output of `mNPS_procChon()`
+### output of `mNPS_procJOVE()`
 * `output_table` = _n_ x 19 table, where _n_ is the number of processed cell events
 * `output_table.diameter` = cell diameter [µm]
 * `output_table.def_diameter` = transverse diameter of the cell in the contraction segment [µm]
@@ -52,6 +58,16 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* cells that did not recover within the NPS channel have a recovery time of `Inf`
 
 #### example data:
+
+* 20220617_A549_dev2B_w12_p25_try1.mat
+	* acquired by RR on 06.17.2022 using the main SRL NPS platform
+	* devices: sNPS_ver2.1 (wC=12), channel height ~= 30µm
+	* A549 cells, passage 3, in PBS + 2% FBS
+
+* 20220616_BEAS2B_Dev1B_w10_p30_try1.mat
+	* acquired by AL on 06.16.2022 using the main SRL NPS platform
+	* devices: sNPS_ver2.1 (wC=10), channel height ~= 30µm
+	* BEAS2B cells
 
 * EDL_11_04_19_test1_2018.mat
 	* acquired by EDL on 11.04.2019 using the O'Connell NPS platform
