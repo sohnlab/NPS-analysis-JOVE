@@ -1,5 +1,5 @@
 function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_cat_description] = ...
-    mNPS_readChon(data_vector, sampleRate, ch_height, De_np, thresholds, plotflag, fitflag)
+    mNPS_readJOVE(data_vector, sampleRate, ch_height, De_np, thresholds, plotflag, fitflag)
 % Reads mNPS data and returns OUT_array matrix
 % INPUTS:
 %   data_vector = row vector of doubles
@@ -13,8 +13,8 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     %% SECTION 0: device parameters
 
     % segment layout
-    total_segs = 6;
-    num_ref_segs = 2;
+    total_segs = 7;
+    num_ref_segs = 3;
     num_rec_segs = 3;
     % check layout
     if total_segs ~= (num_ref_segs + num_rec_segs + 1)
@@ -22,11 +22,16 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     end
 
     % mask geometry [um]
-    L = 5250; % mNPS_chon_v3 - total length of the NPS channel (from start of 1st pore to end of last pore)
-    npL = 600; % mNPS_chon_v3
-    sqL = 2000; % mNPS_chon_v3
-    wC = 10.5; % mNPS_chon_v3
-    wNP = 18; % mNPS_chon_v3
+    L = 8130; % sNPS_ver2.1 (both) - total length of the NPS channel (from start of 1st pore to end of last pore)
+    npL_ref = [1155, 1155, 577.5]; % sNPS_ver2.1 (both)
+    npL_rec = [577.5, 1155, 1155]; % sNPS_ver2.1 (both)
+    sqL = 2055; % sNPS_ver2.1 (both)
+    wC_10 = 10; % sNPS_ver2.1 (wc=10)
+    wC_12 = 12; % sNPS_ver2.1 (wc=12)
+    wNP = 25; % sNPS_ver2.1 (both)
+
+    wC = [];
+    npL = [];
 
     % calculate De_c based on De_np
     De_c = De_np*(wC/wNP)^(0.5); % D_e (effective diameter) for contraction segment

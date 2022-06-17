@@ -1,4 +1,4 @@
-function output_table = mNPS_procChon(filepath, ch_height, De_np, thresholds, sampleRate)
+function output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sampleRate)
 % [ output_matrix ] = sNPS( start, number_of_files, thresholds )
 %   Reads all sNPS data, analyzes data and returns final output matrix.
 %   Needs a vector of 2 thresholds for initial thresholding. Afterwards,
@@ -41,7 +41,7 @@ function output_table = mNPS_procChon(filepath, ch_height, De_np, thresholds, sa
 
     %% read all, search for pulses, get column information
     [all_out, ~, ~, outcols, outunits, rec_des] = ...
-        mNPS_readChon(data, sampleRate, ch_height, De_np, thresholds, false, false);
+        mNPS_readJOVE(data, sampleRate, ch_height, De_np, thresholds, false, false);
 
     %% remove duplicate files to read
 
@@ -68,7 +68,7 @@ function output_table = mNPS_procChon(filepath, ch_height, De_np, thresholds, sa
 
                 iterdata = data(20*(uni_win(i)-200):20*(uni_win(i)+1600)); % change window size (originally 800)
                 % measure a new pulse
-                [iter_out, emptyflag] = mNPS_readChon(iterdata, sampleRate, ch_height, De_np, new_th, false, false);
+                [iter_out, emptyflag] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, new_th, false, false);
                 % iter_out: output of one iteration
                 % emptyflag: skip pulse if TRUE
                 % auto: values for computing auto-threshold value
@@ -82,7 +82,7 @@ function output_table = mNPS_procChon(filepath, ch_height, De_np, thresholds, sa
                     i = i+1;
                     searchflag = true;
                 else
-                    [iter_out, ~, auto] = mNPS_readChon(iterdata, sampleRate, ch_height, De_np, new_th, true, true);
+                    [iter_out, ~, auto] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, new_th, true, true);
                     searchflag = false;
                 end
 
