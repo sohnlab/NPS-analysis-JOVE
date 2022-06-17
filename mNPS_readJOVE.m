@@ -1,14 +1,15 @@
 function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_cat_description] = ...
-    mNPS_readJOVE(data_vector, sampleRate, ch_height, De_np, thresholds, plotflag, fitflag)
-% Reads mNPS data and returns OUT_array matrix
-% INPUTS:
-%   data_vector = row vector of doubles
-%   sampleRate = int [Hz]
-%   ch_height = double [um]: channel height measured from SU-8 wafer
-%   De_np = double [um]: effective diameter for the node-pore segments (from REF device)
-%   thresholds = 1x2 vector of doubles: [low_threshold, high_threshold]
-%   plotflag = bool: whether to plot the window data
-%   fitflat = bool: whether to perform mNPS-r recovery curve fitting
+    mNPS_readJOVE(data_vector, sampleRate, ch_height, De_np, wC, thresholds, plotflag, fitflag)
+    % Reads mNPS data and returns OUT_array matrix
+    % INPUTS:
+    %   data_vector = row vector of doubles
+    %   sampleRate = int [Hz]
+    %   ch_height = double [um]: channel height measured from SU-8 wafer
+    %   De_np = double [um]: effective diameter for the node-pore segments (from REF device)
+    %   wC = double [um]: width of the contraction segment
+    %   thresholds = 1x2 vector of doubles: [low_threshold, high_threshold]
+    %   plotflag = bool: whether to plot the window data
+    %   fitflat = bool: whether to perform mNPS-r recovery curve fitting
 
     %% SECTION 0: device parameters
 
@@ -26,11 +27,8 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     npL_ref = [1155, 1155, 577.5]; % sNPS_ver2.1 (both)
     npL_rec = [577.5, 1155, 1155]; % sNPS_ver2.1 (both)
     sqL = 2055; % sNPS_ver2.1 (both)
-    wC_10 = 10; % sNPS_ver2.1 (wc=10)
-    wC_12 = 12; % sNPS_ver2.1 (wc=12)
     wNP = 25; % sNPS_ver2.1 (both)
 
-    wC = [];
     npL = [];
 
     % calculate De_c based on De_np
@@ -43,8 +41,9 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     N = 20; % downsample factor
 
     % flip if negative
-    if (mean(data_vector) < 0 )
+    if (sum(data_vector<0) / length(data_vector)) > 0.5
         data_vector = -data_vector;
+        warning('inverting raw data because the majority of datapoints were negative');
     end
 
     y_smoothed = fastsmooth(data_vector',200,1,1); % perform rectangular smoothing
@@ -88,7 +87,6 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
             k = k+1;
         end
     end
-
 
     %% SECTION 4: remove error from A
 
@@ -136,7 +134,6 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     end
     unique_ys = nz_mat(2,unique_is);
     nz_mat = [unique_xs; unique_ys];
-
 
     %% SECTION 6: rectangularize pulses
 
@@ -274,7 +271,7 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     %% SECTION 9: Extract mNPS pulse data
 
     % preallocate array of NPS pulse data
-    out = ones(length(pulse_series) - (total_segs-1), 12);
+    out = nan(length(pulse_series) - (total_segs-1), 12);
 
     for k = 1 : length(pulse_series)+1-total_segs
 
@@ -399,7 +396,6 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         set(figf,'units','pixels','pos',figsize);
 
     end
-
 
     %% Section 9b: compute derived values
 

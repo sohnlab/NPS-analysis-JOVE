@@ -24,8 +24,11 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* `mNPS_readChon()` is now `mNPS_readJOVE()`
 * adjusted hard-coded device parameters in `mNPS_readJOVE.m`
 * `mNPS_procJOVE()`:
-	* requires 1xn vector for `data` instead of 2xn
+	* require 1xn vector for `data` instead of 2xn
 	* fixed nargin bug
+	* `wC` must be passed as an argument
+* `mNPS_readJOVE()`
+	* `wC` must be passed as an argument
 
 ### updates 04.30.2020
 * inputs & outputs for processing functions

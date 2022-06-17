@@ -45,13 +45,15 @@ fs = S_in.sampleRate;
 w_NP = 25; % channel width in node-pore sections [um]
 
 % 06/17/2022 (A549, wC=12)
+wC = 12; % [um] contraction channel width
 ch_height = 30; % [um] (approximate)
 De_np = 2 * ch_height * w_NP / (ch_height + w_NP); % effective diameter estimate
 thresholds = []; % use defaults
-out_04 = mNPS_procJOVE(filepath_JOVE12, ch_height, De_np, thresholds, fs);
+out_04 = mNPS_procJOVE(filepath_JOVE12, ch_height, De_np, wC, thresholds, fs);
 
-% 06/16/2022 (BEAS2B, wC=10)
-ch_height = 30; % [um] (approximate)
-De_np = 2 * ch_height * w_NP / (ch_height + w_NP); % effective diameter estimate
-thresholds = []; % use defaults
-out_04 = mNPS_procJOVE(filepath_JOVE10, ch_height, De_np, thresholds, fs);
+% % 06/16/2022 (BEAS2B, wC=10)
+% wC = 10; % [um] contraction channel width
+% ch_height = 30; % [um] (approximate)
+% De_np = 2 * ch_height * w_NP / (ch_height + w_NP); % effective diameter estimate
+% thresholds = []; % use defaults
+% out_04 = mNPS_procJOVE(filepath_JOVE10, ch_height, De_np, wC, thresholds, fs);

@@ -1,4 +1,4 @@
-function output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sampleRate)
+function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate)
 % [ output_matrix ] = sNPS( start, number_of_files, thresholds )
 %   Reads all sNPS data, analyzes data and returns final output matrix.
 %   Needs a vector of 2 thresholds for initial thresholding. Afterwards,
@@ -12,6 +12,8 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sa
 %   De_np = double [um]
 %       effective diameter for the node-pore segments
 %       measured by running calibration particles through the REF device
+%   wC = double [um]
+%       contraction channel width
 %   thresholds (optional) = 1x2 vector of doubles
 %       [low_threshold, high_threshold]
 %       default = [1e-4, 1e-3]
@@ -28,18 +30,18 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sa
     end
 
     % apply default parameters, if not supplied
-    if nargin < 5
+    if nargin < 6 || isempty(sampleRate)
         sampleRate = 50000;
         fprintf('default sample rate used: %d Hz\n', sampleRate);
     end
-    if nargin < 4 || isempty(thresholds)
+    if nargin < 5 || isempty(thresholds)
         thresholds = [1e-4, 1e-3];
         fprintf('Auto thresholds set to %3.2e, %3.2e\n',thresholds);
     end
 
     %% read all, search for pulses, get column information
     [all_out, ~, ~, outcols, outunits, rec_des] = ...
-        mNPS_readJOVE(data, sampleRate, ch_height, De_np, thresholds, false, false);
+        mNPS_readJOVE(data, sampleRate, ch_height, De_np, wC, thresholds, false, false);
 
     %% remove duplicate files to read
 
