@@ -29,6 +29,7 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* `wC` must be passed as an argument
 * `mNPS_readJOVE()`
 	* `wC` must be passed as an argument
+	* calculate average velocity in ref segments of unequal lengths
 
 ### updates 04.30.2020
 * inputs & outputs for processing functions

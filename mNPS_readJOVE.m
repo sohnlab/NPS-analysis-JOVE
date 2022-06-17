@@ -29,8 +29,6 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     sqL = 2055; % sNPS_ver2.1 (both)
     wNP = 25; % sNPS_ver2.1 (both)
 
-    npL = [];
-
     % calculate De_c based on De_np
     De_c = De_np*(wC/wNP)^(0.5); % D_e (effective diameter) for contraction segment
 
@@ -290,8 +288,16 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         I_baseline = pulse_series(k,3); % baseline current
         
         % average dI & dT in reference segments
-        dI_np = -mean(pulse_series(ref_k_start:ref_k_end,4)); % average node-pore current drop
-        dT_np = mean( pulse_series(ref_k_start:ref_k_end,2) - pulse_series(ref_k_start:ref_k_end,1) ) /Fs*N; % average node-pore transit time (ms)
+
+        % average node-pore current drop in reference segments
+        dI_np = -mean(pulse_series(ref_k_start:ref_k_end,4));
+
+        % average node-pore transit time in reference segments [ms]
+        %   *** not applicable in JOVE device designs (sNPS_v2.1) bc the segments are of unequal lengths
+        dT_np = nan;
+
+        % node-pore transit time in each reference segment [ms] (row vector)
+        dT_np_segs = ( pulse_series(ref_k_start:ref_k_end,2) - pulse_series(ref_k_start:ref_k_end,1) )' ./Fs.*N;
 
         % dI & dT in contraction (sqeeze) segment
         dI_c = -pulse_series(sq_k,4); % squeeze current drop
@@ -409,7 +415,7 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     calculated(:,2) = (calculated(:,1)-wC)./calculated(:,1);
 
     % np velocity (mm/s = µm/ms)
-    calculated(:,3) = npL./out(:,6);
+    calculated(:,3) = mean( npL_ref ./ (dT_np_segs) );
 
     % sq velocity (mm/s = µm/ms)
     calculated(:,4) = sqL./out(:,7);
