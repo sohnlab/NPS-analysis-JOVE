@@ -29,6 +29,7 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* fixed nargin bug
 	* `wC` must be passed as an argument
 	* accept ASLS params as argument
+	* increase window size
 * mNPS_readJOVE.m
 	* adjusted hard-coded device parameters to reflect sNPS_ver2.1 used in JOVE experiments
 	* `wC` must be passed as an argument
@@ -87,7 +88,6 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 
 #### example results:
 
-* output_04_first12cells.mat
-	* results of running `mNPS_procChon()` using data from EDL_11_04_19_test1_2018.mat
-	* quit the analysis after 12 cells were identified & processed
-	* includes file names for the data sources; sample rate, wafer info, & default thresholds used; and output table
+* output_j12.mat
+	* results of running `mNPS_procChon()` using data from 20220617_A549_dev2B_w12_p25_try1.mat (using testscript.m)
+	* includes source data file names; processing parameters & default thresholds; and output table

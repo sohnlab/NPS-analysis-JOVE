@@ -75,9 +75,11 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
                 fprintf('\nNow reading index: %d\n',uni_win(i));
                 fprintf('Progress: %2.1f %%\n',i/length(uni_win)*100);
 
-                iterdata = data(20*(uni_win(i)-200):20*(uni_win(i)+1600)); % change window size (originally 800)
+                % for LPF padding, ensure window size (when downsampled 20x) will be bigger than the downsampled rate in Hz
+                iterdata = data( 20*(uni_win(i)-200) : 20*(uni_win(i)+2300) ); % change window size
+
                 % measure a new pulse
-                [iter_out, emptyflag] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, new_th, false, false);
+                [iter_out, emptyflag] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, wC, new_th, false, false, ASLS_param);
                 % iter_out: output of one iteration
                 % emptyflag: skip pulse if TRUE
                 % auto: values for computing auto-threshold value
@@ -91,7 +93,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
                     i = i+1;
                     searchflag = true;
                 else
-                    [iter_out, ~, auto] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, new_th, true, true);
+                    [iter_out, ~, auto] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, wC, new_th, true, true, ASLS_param);
                     searchflag = false;
                 end
 
