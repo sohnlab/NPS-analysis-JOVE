@@ -2,7 +2,7 @@
 
 ### mechano-NPS data analysis for the JOVE protocol paper
 adapted from NPS-analysis-chondrocytes  
-*copyright 2022 Kristen Cotner, Brian Li*
+*copyright 2022 Kristen Cotner, Brian Li, Alan Dong*
 
 Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes with mechano-node-pore sensing. *Microsyst Nanoeng* **4**, 17091 (2018). https://doi.org/10.1038/micronano.2017.91
 
@@ -33,11 +33,13 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* calculate average velocity in ref segments of unequal lengths
 	* use updated `ASLS()`
 	* accept ASLS params as argument
+	* add LPF step
 * mNPS_fastQC.m
 	* use updated `ASLS()`
 	* accept ASLS params as argument
 * ASLS.m
-	* use updated version from coded-nps-software (includes `noise_margin` parameter)
+	* use updated version of ASLS from coded-nps-software (includes `noise_margin` parameter)
+	* also include pad_data.m and unpad_data.m helper functions
 
 ### updates 04.30.2020
 * inputs & outputs for processing functions

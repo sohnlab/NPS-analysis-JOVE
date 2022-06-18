@@ -57,18 +57,40 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         ym = ym'; % transpose if vector is of the wrong dimension
     end
 
+    % low-pass filter
+    %   - default bw_lpf would be 5/min_pulse_width [Hz]
+    %   - observed short pulse in 0220617_A549_dev2B_w12_p25_try1.mat was 133 samples at (50kHz / 20) >>> 0.0532sec
+    bw_lpf = 50;
+    resample_rate = sampleRate/N;
+    filtered_data = unpad_data(lowpass(pad_data(ym-ym(1), resample_rate), bw_lpf, resample_rate), resample_rate) + ym(1);
+
+%     %%% BREAKPOINT
+%     figure; lh1=plot(ym, 'k', 'linew',2); hold on; lh2=plot(filtered_data, 'r', 'linew',2);
+
     % remove baseline
+    ym = filtered_data;
     y_baseline = -1 * ASLS(-1*ym, ASLS_param);
     y_detrend = ym - y_baseline;
+
+%     %%% BREAKPOINT
+%     figure; lh1=plot(ym, 'k', 'linew',2); hold on; lh2=plot(ym-y_detrend, 'r', 'linew',2);
 
     %% SECTION 2: threshold signal by differences
     % take the difference of ym, threshold by lower value
     % thresholds for differences, user provided
 
     ym_diff = diff(y_detrend); % compute difference
+
+%     %%% BREAKPOINT
+%     figure; ax1=subplot(2,1,1); lh1=plot(y_detrend,'linew',1); ax2=subplot(2,1,2); lh2=plot(ym_diff,'k','linew',1); linkaxes([ax1,ax2],'x');
+%     hold(ax2,'on'); ylo=yline(ax2,[1,-1]*thresholds(1),'b','linew',2); yhi=yline(ax2,[1,-1]*thresholds(2),'r','linew',2);
+
     ym_diff(abs(ym_diff) < thresholds(1)) = 0; % threshold values below thresholds(1)
     ym_diff(1:10) = 0; % zero out the first few values
     ym_diff(end-10:end) = 0; % zero out the last few values
+
+%     %%% BREAKPOINT
+%     hold(ax2,'all'); delete(lh2); lh2=plot(ax2, ym_diff,'k','linew',1);
 
     % ensure all values in squeeze channel are zero
     squeeze_begin = find(ym_diff <= -thresholds(2),1); % find where squeeze starts
@@ -80,6 +102,9 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
 
     squeeze_end = find(ym_diff(squeeze_begin+20:end) >= thresholds(2),1); % find end of squeeze
     ym_diff(squeeze_begin+1:squeeze_begin+squeeze_end+20) = 0; % zero out the squeeze channel
+
+%     %%% BREAKPOINT
+%     hold(ax2,'all'); delete(lh2); lh2=plot(ax2, ym_diff,'k','linew',1);
 
     %% SECTION 3: identify nonzero differences (nz_mat is the matrix of nonzero differences)
 
