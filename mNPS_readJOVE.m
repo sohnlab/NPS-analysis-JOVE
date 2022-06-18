@@ -193,12 +193,17 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         empty = false;
     end
 
-    if plotflag == true
-        Pix_SS = get(0,'screensize');
-        figh = figure(42); 
-        figsize = [0.1 0.1 0.45 0.75]*Pix_SS(4);
-        set(figh,'units','pixels','pos',figsize);
+    if plotflag
 
+        if isempty( findobj('type','figure', 'number',42) ) % create a new figure
+            Pix_SS = get(0,'screensize');
+            figh = figure(42);
+            figsize = [0.1 0.1 0.45 0.75]*Pix_SS(4);
+            set(figh,'units','pixels','pos',figsize);
+        else % use the existing figure (don't change size/location)
+            figh = figure(42);
+        end
+        
         % take top and bottom 3 values
         nsorted_d = sort(ym_diff);
         min_vals = nsorted_d(1:3);
@@ -216,7 +221,7 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         % difference plot
         ax1 = subplot(3,1,1);
         figwin_tighten();
-        difp = plot(ym_diff,'k-'); difp.LineWidth = 1;
+        plot(ym_diff,'k-', 'LineWidth',1);
         title('y_{diff}');
         set(gca,'FontSize',10);
         grid(ax1,'on');
@@ -231,24 +236,15 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         end
 
         % plot thresholds
-        hold on
-        linel = length(ym_diff);
-        bthlin_l = line([0 linel], [-thresholds(1), -thresholds(1)]);
-        bthlin_u = line([0 linel], [thresholds(1), thresholds(1)]);
-
-        tthlin_l = line([0 linel], [-thresholds(2), -thresholds(2)]);
-        tthlin_u = line([0 linel], [thresholds(2), thresholds(2)]);
-
-        bthlin_l.Color = [1 0 0];
-        bthlin_u.Color = [1 0 0];
-        tthlin_l.Color = [0 0 1];
-        tthlin_u.Color = [0 0 1];
-        hold off
+        hold(ax1,'on');
+        yline(ax1, [1,-1]*thresholds(1), 'b', 'linew',1);
+        yline(ax1, [1,-1]*thresholds(2), 'b--', 'linew',1.5);
+        hold(ax1,'off');
 
         % rectangularized
         ax2 = subplot(3,1,2);
         figwin_tighten();
-        plot(ym_rect);
+        plot(ym_rect, 'k', 'linew',1);
         title('y_{rect}');
         set(gca,'FontSize',10);
         grid(ax2,'on');
@@ -256,12 +252,17 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         axis([0, length(ym_rect), 1.1*min(ym_rect), 0.01]);
 
         % smoothed
-        subplot(3,1,3);
+        ax3 = subplot(3,1,3);
         figwin_tighten();
-        plot(y_smoothed,'k-');
+        plot(ym, 'k', 'linew',1);
+        hold(ax3,'on'); plot(ym-y_detrend, 'm', 'linew',1); hold(ax3,'off');
         title('y_{LP}');
         set(gca,'FontSize',10);
-        axis([0, length(y_smoothed), 0.999*min(y_smoothed), 1.001*max(y_smoothed)]);
+        grid(ax3,'on');
+        ax3.XMinorGrid = 'on';
+        axis([0, length(ym), 0.999*min(ym), 1.001*max(ym)]);
+
+        linkaxes([ax1,ax2,ax3], 'x');
 
     else
         auto_thresh_value = [];
@@ -273,7 +274,7 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     i=1;
     k = 0;
     backset = 10;
-    pulse_series = ones(length(nz_mat),4);
+    pulse_series = ones(length(nz_mat),5);
     while (i < length(nz_mat))
         if nz_mat(2,i) < 0 && nz_mat(2,i+1) > 0 % starts negative and flips sign
             k = k + 1;
@@ -297,6 +298,40 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
             cci = cci + 1;
         end
     end
+
+    % plot detected pulses
+    if plotflag
+        nstarts = pulse_series(:,1);
+        nstops = pulse_series(:,2);
+        hold([ax1,ax2,ax3], 'all');
+    
+        % on the diff plot
+        plot(ax1, nstarts,ym_diff(nstarts), 'bo', 'linew',1.5, 'markersi',8);
+        plot(ax1, nstops,ym_diff(nstops), 'ro', 'linew',1.5, 'markersi',8);
+
+        % on the rect plot
+        for ii=1:length(nstarts)
+            sc = plot(ax2, nstarts(ii):nstops(ii), ym_rect(nstarts(ii):nstops(ii)), 'linew',3);
+            if mod(ii,2)==0
+                set(sc, 'color','r');
+            else
+                set(sc, 'color','b');
+            end
+        end
+        
+        % on the data plot
+        for ii=1:length(nstarts)
+            sc = plot(ax3, nstarts(ii):nstops(ii), ym(nstarts(ii):nstops(ii)), 'linew',2.5);
+            if mod(ii,2)==0
+                set(sc, 'color','r');
+            else
+                set(sc, 'color','b');
+            end
+        end
+        
+        hold([ax1,ax2,ax3], 'off');
+    end
+
 
     %% SECTION 9: Extract mNPS pulse data
 
@@ -325,7 +360,7 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         dI_np = -mean(pulse_series(ref_k_start:ref_k_end,4));
 
         % average node-pore transit time in reference segments [ms]
-        %   *** not applicable in JOVE device designs (sNPS_v2.1) bc the segments are of unequal lengths
+        %   *** not applicable in JOVE device designs (sNPS_ver2.1) bc the segments are of unequal lengths
         dT_np = nan;
 
         % node-pore transit time in each reference segment [ms] (row vector)
@@ -423,15 +458,19 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
 
     if fitflag
 
-        Pix_SS = get(0,'screensize');
+        if isempty( findobj('type','figure', 'number',43) ) % create a new figure
+            Pix_SS = get(0,'screensize');
+            figf = figure(43);
+            figsize = [0.70 0.6 1/3 2/9]*Pix_SS(4);
+            set(figf,'units','pixels','pos',figsize);
+        else % use the existing figure (don't change size/location)
+            figf = figure(43);
+        end
 
-        figf = figure(43);
         title('Curve Fit'),
         ffunc = @(x) fo.p2+fo.p1*x;
         fplot(ffunc,[rT(1), rT(end)]),
         hold on, scatter(rT,rdI), hold off,
-        figsize = [0.70 0.6 1/3 2/9]*Pix_SS(4);
-        set(figf,'units','pixels','pos',figsize);
 
     end
 
