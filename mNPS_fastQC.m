@@ -1,9 +1,10 @@
-function [y_smoothed, y_downsampled, y_detrended] = mNPS_fastQC(data, sampleRate, k_sample, detrend_flag, filt_flag)
+function [y_smoothed, y_downsampled, y_detrended] = mNPS_fastQC(data, sampleRate, k_sample, detrend_flag, filt_flag, ASLS_param)
 % Fast option for post-processing mNPS signal.
 %   default sampleRate = 50000 [Hz]
 %   default k_sample (downsample factor) = 20
 %   optional bool detrend_flag to perform baseline subtraction (default=false)
 %   optional bool filt_flag to enable 60 Hz bandstop filter (default=false)
+%   optional struct ASLS_param (baseline fitting parameters passed to ASLS.m)
 
     %% parse inputs
     
@@ -18,17 +19,29 @@ function [y_smoothed, y_downsampled, y_detrended] = mNPS_fastQC(data, sampleRate
         error('data must be a vector or a 2xn array');
     end
     
-    if nargin<5
+    if nargin<5 || isempty(filt_flag)
         filt_flag = false;
-        if nargin<4
-            detrend_flag = false;
-            if nargin<3
-                k_sample = 20; % to downsample from 50 kHz to 2.5 kHz
-                if nargin<2
-                    sampleRate = 50e3; % 50 kHz
-                end
-            end
-        end
+    end
+
+    if nargin<4 || isempty(detrend_flag)
+        detrend_flag = false;
+    end
+
+    if nargin<3 || isempty(k_sample)
+        k_sample = 20; % to downsample from 50 kHz to 2.5 kHz
+    end
+
+    if nargin<2 || isempty(sampleRate)
+        sampleRate = 50e3; % 50 kHz
+    end
+
+    % default ASLS parameters (if needed)
+    if ( nargin<6 || isempty(ASLS_param) ) && detrend_flag
+        ASLS_param = struct();
+        ASLS_param.lambda = 1e9; % default 1e5; larger=smoother, smaller=wiggly-er (may not be unit-independent)
+        ASLS_param.p = 3e-3; % default 0.01; 0>p>1 (as low as possible while still converging)
+        ASLS_param.noise_margin = 1e-4; % default 0; allows baseline to sit within the baseline noise
+        ASLS_param.max_iter = 20; % default 5; just make sure it converges
     end
     
     %% perform preprocessing
@@ -54,12 +67,8 @@ function [y_smoothed, y_downsampled, y_detrended] = mNPS_fastQC(data, sampleRate
     
     % subtract baseline if desired
     if detrend_flag
-        ASLS_param = struct();
-        ASLS_param.lambda = 1e9; % larger=smoother, smaller=wiggly-er (may not be unit-independent)
-        ASLS_param.p = 3e-3; % 0>p>1 (as low as possible while still converging)
-        ASLS_param.noise_margin = 2.5e-4; % allows baseline to sit within the baseline noise
-        ASLS_param.max_iter = 20; % make sure it converges
-        y_detrended = y_downsampled - ASLS(y_downsampled,ASLS_param);
+        y_baseline = -1 * ASLS(-1*y_downsampled, ASLS_param);
+        y_detrended = y_downsampled - y_baseline;
     else
         y_detrended = [];
     end

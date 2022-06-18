@@ -1,5 +1,5 @@
 function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_cat_description] = ...
-    mNPS_readJOVE(data_vector, sampleRate, ch_height, De_np, wC, thresholds, plotflag, fitflag)
+    mNPS_readJOVE(data_vector, sampleRate, ch_height, De_np, wC, thresholds, plotflag, fitflag, ASLS_param)
     % Reads mNPS data and returns OUT_array matrix
     % INPUTS:
     %   data_vector = row vector of doubles
@@ -10,6 +10,11 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     %   thresholds = 1x2 vector of doubles: [low_threshold, high_threshold]
     %   plotflag = bool: whether to plot the window data
     %   fitflat = bool: whether to perform mNPS-r recovery curve fitting
+    %   ASLS_param = struct (optional): baseline fitting parameters passed to ASLS.m
+
+    if nargin<9
+        ASLS_param = []; % use defaults
+    end
 
     %% SECTION 0: device parameters
 
@@ -53,12 +58,8 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     end
 
     % remove baseline
-    ASLS_param = struct();
-    ASLS_param.lambda = 1e9; % larger=smoother, smaller=wiggly-er (may not be unit-independent)
-    ASLS_param.p = 1e-4; % 0>p>1 (as low as possible while still converging)
-    ASLS_param.noise_margin = 2.5e-4; % allows baseline to sit within the baseline noise
-    ASLS_param.max_iter = 10; % make sure it converges
-    y_detrend = ym - ASLS(ym, ASLS_param);
+    y_baseline = -1 * ASLS(-1*ym, ASLS_param);
+    y_detrend = ym - y_baseline;
 
     %% SECTION 2: threshold signal by differences
     % take the difference of ym, threshold by lower value

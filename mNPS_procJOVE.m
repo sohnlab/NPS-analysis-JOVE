@@ -1,4 +1,4 @@
-function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate)
+function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate, ASLS_param)
 % [ output_matrix ] = sNPS( start, number_of_files, thresholds )
 %   Reads all sNPS data, analyzes data and returns final output matrix.
 %   Needs a vector of 2 thresholds for initial thresholding. Afterwards,
@@ -39,9 +39,18 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
         fprintf('Auto thresholds set to %3.2e, %3.2e\n',thresholds);
     end
 
+    % default ASLS parameters (if needed)
+    if nargin<7 || isempty(ASLS_param)
+        ASLS_param = struct();
+        ASLS_param.lambda = 1e9; % default 1e5; larger=smoother, smaller=wiggly-er (may not be unit-independent)
+        ASLS_param.p = 3e-3; % default 0.01; 0>p>1 (as low as possible while still converging)
+        ASLS_param.noise_margin = 1e-4; % default 0; allows baseline to sit within the baseline noise
+        ASLS_param.max_iter = 20; % default 5; just make sure it converges
+    end
+
     %% read all, search for pulses, get column information
     [all_out, ~, ~, outcols, outunits, rec_des] = ...
-        mNPS_readJOVE(data, sampleRate, ch_height, De_np, wC, thresholds, false, false);
+        mNPS_readJOVE(data, sampleRate, ch_height, De_np, wC, thresholds, false, false, ASLS_param);
 
     %% remove duplicate files to read
 

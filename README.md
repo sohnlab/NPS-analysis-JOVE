@@ -7,7 +7,7 @@ adapted from NPS-analysis-chondrocytes
 Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes with mechano-node-pore sensing. *Microsyst Nanoeng* **4**, 17091 (2018). https://doi.org/10.1038/micronano.2017.91
 
 #### example: data processing
-`>> output_table = mNPS_procJOVE(filepath, ch_height, De_np, thresholds, sampleRate);`  
+`>> output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate);`  
 `>> disp(output_table);`  
 `>> summary(output_table);`  
 `>> histogram(output_table.wCDI);`  
@@ -15,25 +15,28 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 `>> writetable(output_table, 'output_file.txt');`
 
 #### example: quick data visualization
-`>> [y_smoothed, y_downsampled] = mNPS_fastQC(data)`  
+`>> [y_smoothed, y_downsampled, ~] = mNPS_fastQC(data)`  
 `>> plot(y_downsampled)`
 
 ### updates 06.17.2022 (adapting for JOVE devices)
 * renamed functions
 	* `mNPS_procChon()` is now `mNPS_procJOVE()`
 	* `mNPS_readChon()` is now `mNPS_readJOVE()`
-* `mNPS_procJOVE.m`:
+* mNPS_procJOVE.m
 	* require 1xn vector for `data` instead of 2xn
 	* fixed nargin bug
 	* `wC` must be passed as an argument
-* `mNPS_readJOVE.m`
+	* accept ASLS params as argument
+* mNPS_readJOVE.m
 	* adjusted hard-coded device parameters to reflect sNPS_ver2.1 used in JOVE experiments
 	* `wC` must be passed as an argument
 	* calculate average velocity in ref segments of unequal lengths
 	* use updated `ASLS()`
-* `mNPS_fastQC.m`
+	* accept ASLS params as argument
+* mNPS_fastQC.m
 	* use updated `ASLS()`
-* `ASLS.m`
+	* accept ASLS params as argument
+* ASLS.m
 	* use updated version from coded-nps-software (includes `noise_margin` parameter)
 
 ### updates 04.30.2020
