@@ -1,4 +1,4 @@
-function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate, ASLS_param)
+function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate, ASLS_param, eventlength_filt)
 % [ output_matrix ] = sNPS( start, number_of_files, thresholds )
 %   Reads all sNPS data, analyzes data and returns final output matrix.
 %   Needs a vector of 2 thresholds for initial thresholding. Afterwards,
@@ -20,26 +20,25 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
 %       pass [] or '' to use default thresholds
 %   sampleRate (optional) = int [Hz]
 %       default = 50e3
+%   ASLS_param (optional) = struct
+%       baseline fitting parameters passed to ASLS.m
+%       if not provided, fills with default parameter values
+%   eventlength_filt (optional)
+%       expected # of filtered samples for a whole cell transit (default 2000)
 
     %% parse inputs
 
-    % load data
-    load(filepath,'data');
-    if ~( size(data,1)==1 && size(data,2)>2 )
-        error('the variable `data` in filepath must be a 1xn array of doubles');
-    end
-
-    % apply default parameters, if not supplied
-    if nargin < 6 || isempty(sampleRate)
-        sampleRate = 50000;
-        fprintf('default sample rate used: %d Hz\n', sampleRate);
-    end
     if nargin < 5 || isempty(thresholds)
         thresholds = [1e-4, 1e-3];
         fprintf('Auto thresholds set to %3.2e, %3.2e\n',thresholds);
     end
 
-    % default ASLS parameters (if needed)
+    if nargin < 6 || isempty(sampleRate)
+        sampleRate = 50000;
+        fprintf('default sample rate used: %d Hz\n', sampleRate);
+    end
+
+    % default ASLS parameters
     if nargin<7 || isempty(ASLS_param)
         ASLS_param = struct();
         ASLS_param.lambda = 1e9; % default 1e5; larger=smoother, smaller=wiggly-er (may not be unit-independent)
@@ -48,7 +47,18 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
         ASLS_param.max_iter = 20; % default 5; just make sure it converges
     end
 
+    if nargin<8 || isempty(eventlength_filt)
+        eventlength_filt = 2000;
+    end
+
     %% read all, search for pulses, get column information
+
+    % load data
+    load(filepath,'data');
+    if ~( size(data,1)==1 && size(data,2)>2 )
+        error('the variable `data` in filepath must be a 1xn array of doubles');
+    end
+
     [all_out, ~, ~, outcols, outunits, rec_des] = ...
         mNPS_readJOVE(data, sampleRate, ch_height, De_np, wC, thresholds, false, false, ASLS_param);
 
@@ -78,8 +88,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
                 % set window size parameters
                 min_windowsize_filt = ceil(sampleRate/20); % for LPF padding, ensure window size cover >1sec
                 startoffset_filt = 200; % # filtered samples included before the first detected peak
-                eventlength_filt = 2000; % expect ~2000 filtered samples for the whole cell transit
-                windowsize_filt = eventlength_filt * 1.2; % # raw samples w/ 20% buffer
+                windowsize_filt = eventlength_filt * 1.2; % # filtered samples w/ 20% buffer
                 % set window indices
                 startix_filt = uni_win(i)-startoffset_filt;
                 endix_filt = startix_filt + max(min_windowsize_filt,windowsize_filt);
@@ -131,9 +140,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
             end
 
             if i > size(uni_win,1) % return if finished
-                fprintf('Done reading, check output!\n');
-                close all
-                return
+                break
             end
         end
 

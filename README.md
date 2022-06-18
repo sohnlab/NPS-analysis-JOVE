@@ -30,6 +30,7 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* `wC` must be passed as an argument
 	* accept ASLS params as argument
 	* increase & clarify window size
+	* accept argument for expected event length
 * mNPS_readJOVE.m
 	* adjusted hard-coded device parameters to reflect sNPS_ver2.1 used in JOVE experiments
 	* `wC` must be passed as an argument
@@ -85,6 +86,9 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* acquired by AL on 06.16.2022 using the main SRL NPS platform
 	* devices: sNPS_ver2.1 (wC=10), channel height ~= 30µm
 	* BEAS2B cells
+
+* 20220616_BEAS2B_Dev1B_w10_p30_try1_crop.mat
+	* second half of data from 20220616_BEAS2B_Dev1B_w10_p30_try1.mat
 
 #### example results:
 

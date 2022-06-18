@@ -4,6 +4,7 @@ clearvars; close all;
 
 filepath_JOVE12 = fullfile('example data', '20220617_A549_dev2B_w12_p25_try1.mat');
 filepath_JOVE10 = fullfile('example data', '20220616_BEAS2B_Dev1B_w10_p30_try1.mat');
+filepath_JOVE10c = fullfile('example data', '20220616_BEAS2B_Dev1B_w10_p30_try1_crop.mat');
 
 %% parameters for JOVE example data
 
@@ -28,11 +29,12 @@ ASLS_param = struct('lambda',1e10, 'p',0, 'noise_margin',2.4e-4, 'max_iter',40);
 thresholds = [1e-4, 5e-4];
 
 out_j12 = mNPS_procJOVE(filepath_JOVE12, ch_height, De_np, wC, thresholds, fs, ASLS_param);
+out_j12 = remove_duplicate_rows(out_j12);
 
 %% 06/16/2022 (BEAS2B, wC=10)
 
 % % sample rate: saved in file
-% S_in = load(filepath_JOVE10, 'sampleRate');
+% S_in = load(filepath_JOVE10c, 'sampleRate');
 % fs = S_in.sampleRate;
 % 
 % wC = 10; % [um] contraction channel width
@@ -41,5 +43,14 @@ out_j12 = mNPS_procJOVE(filepath_JOVE12, ch_height, De_np, wC, thresholds, fs, A
 % 
 % ASLS_param = struct('lambda',1e10, 'p',0, 'noise_margin',1.8e-4, 'max_iter',40);
 % thresholds = [0.9e-4, 4e-4];
+% eventlength_filt = 3000;
 % 
-% out_j10 = mNPS_procJOVE(filepath_JOVE10, ch_height, De_np, wC, thresholds, fs, ASLS_param);
+% out_j10c = mNPS_procJOVE(filepath_JOVE10c, ch_height, De_np, wC, thresholds, fs, ASLS_param, eventlength_filt);
+% out_j10c = remove_duplicate_rows(out_j10c);
+
+%% remove obvious duplicates (keep last-recorded instance)
+
+function new_table = remove_duplicate_rows(old_table)
+    [~,ia,~] = unique(old_table.start_ix, 'last');
+    new_table = old_table(ia,:);
+end
