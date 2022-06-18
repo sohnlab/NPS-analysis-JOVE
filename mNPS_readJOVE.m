@@ -338,6 +338,9 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     % preallocate array of NPS pulse data
     out = nan(length(pulse_series) - (total_segs-1), 12);
 
+    % preallocate array of reference segment dT_np_segs
+    dT_np_segs = nan(size(out,1), num_ref_segs);
+
     for k = 1 : length(pulse_series)+1-total_segs
 
         % get relevant row numbers
@@ -364,7 +367,7 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         dT_np = nan;
 
         % node-pore transit time in each reference segment [ms] (row vector)
-        dT_np_segs = ( pulse_series(ref_k_start:ref_k_end,2) - pulse_series(ref_k_start:ref_k_end,1) )' ./Fs.*N;
+        dT_nps = ( pulse_series(ref_k_start:ref_k_end,2) - pulse_series(ref_k_start:ref_k_end,1) )' ./Fs.*N;
 
         % dI & dT in contraction (sqeeze) segment
         dI_c = -pulse_series(sq_k,4); % squeeze current drop
@@ -454,6 +457,9 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         out_units = {'index', 'data units', 'data units', 'data units', 'data units', ...
             'ms',    'ms',   'ms',    '',      '',      '',        'categorical'};
 
+        % save transit time in each reference segment
+        dT_np_segs(k,:) = dT_nps;
+
     end
 
     if fitflag
@@ -486,7 +492,7 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     calculated(:,2) = (calculated(:,1)-wC)./calculated(:,1);
 
     % np velocity (mm/s = µm/ms)
-    calculated(:,3) = mean( npL_ref ./ (dT_np_segs) );
+    calculated(:,3) = mean(npL_ref./dT_np_segs, 2);
 
     % sq velocity (mm/s = µm/ms)
     calculated(:,4) = sqL./out(:,7);
