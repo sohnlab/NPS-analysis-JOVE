@@ -18,10 +18,12 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 `>> [y_smoothed, y_downsampled, ~] = mNPS_fastQC(data)`  
 `>> plot(y_downsampled)`
 
-### updates 06.17.2022 (adapting for JOVE devices)
+### updates June 2022 (adapting for JOVE devices)
 * renamed functions
 	* `mNPS_procChon()` is now `mNPS_procJOVE()`
 	* `mNPS_readChon()` is now `mNPS_readJOVE()`
+* use updated version of ASLS.m from coded-nps-software (includes `noise_margin` parameter)
+	* also include pad_data.m and unpad_data.m helper functions
 * mNPS_procJOVE.m
 	* require 1xn vector for `data` instead of 2xn
 	* fixed nargin bug
@@ -37,9 +39,6 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 * mNPS_fastQC.m
 	* use updated `ASLS()`
 	* accept ASLS params as argument
-* ASLS.m
-	* use updated version of ASLS from coded-nps-software (includes `noise_margin` parameter)
-	* also include pad_data.m and unpad_data.m helper functions
 
 ### updates 04.30.2020
 * inputs & outputs for processing functions
@@ -85,16 +84,6 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* acquired by AL on 06.16.2022 using the main SRL NPS platform
 	* devices: sNPS_ver2.1 (wC=10), channel height ~= 30µm
 	* BEAS2B cells
-
-* EDL_11_04_19_test1_2018.mat
-	* acquired by EDL on 11.04.2019 using the O'Connell NPS platform
-	* devices: mNPS_chon_v3, channel height = 18.21µm
-
-* EDL_P1_w_11_21_test2_cropped.mat
-	* acquired by EDL on 11.21.2019 using the O'Connell NPS platform
-	* devices: mNPS_chon_v3, channel height = 16.6µm
-	* chondrocytes, passage 1, with growth factors
-	* kept only the first 12e6 data points = 240sec (no events occurred after that)
 
 #### example results:
 
