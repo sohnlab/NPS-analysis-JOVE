@@ -52,7 +52,13 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
         ym = ym'; % transpose if vector is of the wrong dimension
     end
 
-    y_detrend = ym - ASLS(ym,1e9,1e-4,10); % remove trend
+    % remove baseline
+    ASLS_param = struct();
+    ASLS_param.lambda = 1e9; % larger=smoother, smaller=wiggly-er (may not be unit-independent)
+    ASLS_param.p = 1e-4; % 0>p>1 (as low as possible while still converging)
+    ASLS_param.noise_margin = 2.5e-4; % allows baseline to sit within the baseline noise
+    ASLS_param.max_iter = 10; % make sure it converges
+    y_detrend = ym - ASLS(ym, ASLS_param);
 
     %% SECTION 2: threshold signal by differences
     % take the difference of ym, threshold by lower value

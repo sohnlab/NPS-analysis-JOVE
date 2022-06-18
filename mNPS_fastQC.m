@@ -54,7 +54,12 @@ function [y_smoothed, y_downsampled, y_detrended] = mNPS_fastQC(data, sampleRate
     
     % subtract baseline if desired
     if detrend_flag
-        y_detrended = y_downsampled - ASLS(y_downsampled,1e9,3e-3,20); % remove baseline
+        ASLS_param = struct();
+        ASLS_param.lambda = 1e9; % larger=smoother, smaller=wiggly-er (may not be unit-independent)
+        ASLS_param.p = 3e-3; % 0>p>1 (as low as possible while still converging)
+        ASLS_param.noise_margin = 2.5e-4; % allows baseline to sit within the baseline noise
+        ASLS_param.max_iter = 20; % make sure it converges
+        y_detrended = y_downsampled - ASLS(y_downsampled,ASLS_param);
     else
         y_detrended = [];
     end
