@@ -29,7 +29,7 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 	* fixed nargin bug
 	* `wC` must be passed as an argument
 	* accept ASLS params as argument
-	* increase window size
+	* increase & clarify window size
 * mNPS_readJOVE.m
 	* adjusted hard-coded device parameters to reflect sNPS_ver2.1 used in JOVE experiments
 	* `wC` must be passed as an argument

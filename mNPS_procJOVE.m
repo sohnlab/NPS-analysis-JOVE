@@ -75,8 +75,21 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
                 fprintf('\nNow reading index: %d\n',uni_win(i));
                 fprintf('Progress: %2.1f %%\n',i/length(uni_win)*100);
 
-                % for LPF padding, ensure window size (when downsampled 20x) will be bigger than the downsampled rate in Hz
-                iterdata = data( 20*(uni_win(i)-200) : 20*(uni_win(i)+2300) ); % change window size
+                % set window size parameters
+                min_windowsize_filt = ceil(sampleRate/20); % for LPF padding, ensure window size cover >1sec
+                startoffset_filt = 200; % # filtered samples included before the first detected peak
+                eventlength_filt = 2000; % expect ~2000 filtered samples for the whole cell transit
+                windowsize_filt = eventlength_filt * 1.2; % # raw samples w/ 20% buffer
+                % set window indices
+                startix_filt = uni_win(i)-startoffset_filt;
+                endix_filt = startix_filt + max(min_windowsize_filt,windowsize_filt);
+                startix = max(1, 20*startix_filt); % ensure valid index
+                endix = min(length(data), 20*endix_filt); % ensure valid index
+                % extract iterdata window & check length
+                iterdata = data(startix:endix);
+                if length(iterdata) < sampleRate+1
+                    warning('iterdata has only %u samples, but sampleRate=%u; this can cause problems with pad_data in LPF', length(iterdata), sampleRate);
+                end
 
                 % measure a new pulse
                 [iter_out, emptyflag] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, wC, new_th, false, false, ASLS_param);
