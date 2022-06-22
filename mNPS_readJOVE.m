@@ -237,8 +237,10 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
 
         % plot thresholds
         hold(ax1,'on');
-        yline(ax1, [1,-1]*thresholds(1), 'b', 'linew',1);
-        yline(ax1, [1,-1]*thresholds(2), 'b--', 'linew',1.5);
+        for yi=[1,-1]
+            yline(ax1, yi*thresholds(1), 'b', 'linew',1);
+            yline(ax1, yi*thresholds(2), 'b--', 'linew',1.5);
+        end
         hold(ax1,'off');
 
         % rectangularized
