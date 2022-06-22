@@ -1,4 +1,4 @@
-function [y_smoothed, y_downsampled, y_detrended] = mNPS_fastQC(data, sampleRate, k_sample, detrend_flag, filt_flag, ASLS_param)
+function [y_smoothed, y_downsampled, y_baseline, y_detrended] = mNPS_fastQC(data, sampleRate, k_sample, detrend_flag, filt_flag, ASLS_param)
 % Fast option for post-processing mNPS signal.
 %   default sampleRate = 50000 [Hz]
 %   default k_sample (downsample factor) = 20
