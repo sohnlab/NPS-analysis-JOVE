@@ -47,10 +47,3 @@ out_j12 = remove_duplicate_rows(out_j12);
 % 
 % out_j10c = mNPS_procJOVE(filepath_JOVE10c, ch_height, De_np, wC, thresholds, fs, ASLS_param, eventlength_filt);
 % out_j10c = remove_duplicate_rows(out_j10c);
-
-%% remove obvious duplicates (keep last-recorded instance)
-
-function new_table = remove_duplicate_rows(old_table)
-    [~,ia,~] = unique(old_table.start_ix, 'last');
-    new_table = old_table(ia,:);
-end

@@ -343,8 +343,19 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
     Fs = 2^16; % sampling frequency
     y = 0.3*exp(-4*t).*sin(t*2*pi*440); % sinusoid
     sound(y,Fs);
+    
+    % remove duplicate cell detections (keep last-recorded instance)
+    output_table = remove_duplicate_rows(output_table);
 
     fprintf('Done reading, check output!\n');
 
 end
+
+%% remove obvious duplicates (keep last-recorded instance)
+
+function new_table = remove_duplicate_rows(old_table)
+    [~,ia,~] = unique(old_table.start_ix, 'last');
+    new_table = old_table(ia,:);
+end
+
 
