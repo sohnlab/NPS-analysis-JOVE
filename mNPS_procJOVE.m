@@ -6,7 +6,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
 %       proceed with user input.
 % INPUTS:
 %   filepath = char
-%       the path to a .mat file containing the variable `data` (1xn double)
+%       the path to a .mat file containing the variable `data` (1xn double), representing measured current (at constant voltage) [any units]
 %   ch_height = double [um]
 %       channel height measured from the SU-8 wafer
 %   De_np = double [um]
@@ -14,7 +14,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
 %       measured by running calibration particles through the REF device
 %   wC = double [um]
 %       contraction channel width
-%   thresholds (optional) = 1x2 vector of doubles
+%   thresholds (optional) = 1x2 vector of doubles [same units as filepath/data]
 %       [low_threshold, high_threshold]
 %       default = [1e-4, 1e-3]
 %       pass [] or '' to use default thresholds

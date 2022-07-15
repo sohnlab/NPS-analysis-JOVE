@@ -2,12 +2,12 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     mNPS_readJOVE(data_vector, sampleRate, ch_height, De_np, wC, thresholds, plotflag, fitflag, ASLS_param)
     % Reads mNPS data and returns OUT_array matrix
     % INPUTS:
-    %   data_vector = row vector of doubles
+    %   data_vector = row vector of doubles, representing measured current (at constant voltage) [any units]
     %   sampleRate = int [Hz]
     %   ch_height = double [um]: channel height measured from SU-8 wafer
     %   De_np = double [um]: effective diameter for the node-pore segments (from REF device)
     %   wC = double [um]: width of the contraction segment
-    %   thresholds = 1x2 vector of doubles: [low_threshold, high_threshold]
+    %   thresholds = 1x2 vector of doubles: [low_threshold, high_threshold] (same units as data_vector)
     %   plotflag = bool: whether to plot the window data
     %   fitflat = bool: whether to perform mNPS-r recovery curve fitting
     %   ASLS_param = struct (optional): baseline fitting parameters passed to ASLS.m

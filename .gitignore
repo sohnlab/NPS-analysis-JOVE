@@ -3,3 +3,6 @@
 
 # ignore Mac system files
 .DS_Store
+
+# ignore VSCode settings files
+.vscode/*

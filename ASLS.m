@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% this code is taken from Eilers, Boelens 'Baseline Correction with 
+% this code is based on Eilers, Boelens 'Baseline Correction with 
 % Asymmetric Least Squares Smoothing' 2005
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
