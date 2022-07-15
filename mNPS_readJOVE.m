@@ -1,6 +1,7 @@
-function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_cat_description] = ...
+function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_cat_description, filtered_data, y_baseline, t_filtered, fs_filtered] = ...
     mNPS_readJOVE(data_vector, sampleRate, ch_height, De_np, wC, thresholds, plotflag, fitflag, ASLS_param)
     % Reads mNPS data and returns OUT_array matrix
+    % 
     % INPUTS:
     %   data_vector = row vector of doubles, representing measured current (at constant voltage) [any units]
     %   sampleRate = int [Hz]
@@ -11,6 +12,14 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     %   plotflag = bool: whether to plot the window data
     %   fitflat = bool: whether to perform mNPS-r recovery curve fitting
     %   ASLS_param = struct (optional): baseline fitting parameters passed to ASLS.m
+    % 
+    % OUTPUTS (selected):
+    %   out_array = event information for processed events
+    %   column_names & column_units correspond to columns of out_array
+    %   filtered_data = signal smoothed, downsampled, LPF [original data units]
+    %   y_baseline = ASLS-fitted baseline for filtered_data [original data units]
+    %   t_filtered = time vector for filtered_data and y_baseline [sec]
+    %   fs_filtered = sample rate for filtered_data and y_baseline [Hz]
 
     if nargin<9
         ASLS_param = []; % use defaults
@@ -61,8 +70,8 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     %   - default bw_lpf would be 5/min_pulse_width [Hz]
     %   - observed short pulse in 0220617_A549_dev2B_w12_p25_try1.mat was 133 samples at (50kHz / 20) >>> 0.0532sec
     bw_lpf = 50;
-    resample_rate = sampleRate/N;
-    filtered_data = unpad_data(lowpass(pad_data(ym-ym(1), resample_rate), bw_lpf, resample_rate), resample_rate) + ym(1);
+    fs_filtered = sampleRate/N;
+    filtered_data = unpad_data(lowpass(pad_data(ym-ym(1), fs_filtered), bw_lpf, fs_filtered), fs_filtered) + ym(1);
 
 %     %%% BREAKPOINT
 %     figure; lh1=plot(ym, 'k', 'linew',2); hold on; lh2=plot(filtered_data, 'r', 'linew',2);
@@ -71,6 +80,10 @@ function [OUT_array, empty, auto_thresh_value, column_names, column_units, rec_c
     ym = filtered_data;
     y_baseline = -1 * ASLS(-1*ym, ASLS_param);
     y_detrend = ym - y_baseline;
+
+    % generate downsampled time vector
+    t_raw = (0:length(data_vector)-1) / sampleRate;
+    t_filtered = (0:length(filtered_data)-1).' / fs_filtered + t_raw(1); % [sec]
 
 %     %%% BREAKPOINT
 %     figure; lh1=plot(ym, 'k', 'linew',2); hold on; lh2=plot(ym-y_detrend, 'r', 'linew',2);

@@ -1,9 +1,10 @@
-function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate, ASLS_param, eventlength_filt)
-% [ output_matrix ] = sNPS( start, number_of_files, thresholds )
-%   Reads all sNPS data, analyzes data and returns final output matrix.
+function [output_table, filtered_data, y_baseline, t_filtered, fs_filtered] = ...
+    mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds, sampleRate, ASLS_param, eventlength_filt)
+%   Reads all mNPS data, analyzes data, and returns final output matrix.
 %   Needs a vector of 2 thresholds for initial thresholding. Afterwards,
 %       QC, thresholding, and analysis for individual pulses will need to
 %       proceed with user input.
+% 
 % INPUTS:
 %   filepath = char
 %       the path to a .mat file containing the variable `data` (1xn double), representing measured current (at constant voltage) [any units]
@@ -25,6 +26,13 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
 %       if not provided, fills with default parameter values
 %   eventlength_filt (optional)
 %       expected # of filtered samples for a whole cell transit (default 2000)
+% 
+% OUTPUTS:
+%   output_table = nx19 table listing the event information & cell phenotypes for the n processed cells
+%   filtered_data = data smoothed, downsampled, LPF [original data units]
+%   y_baseline = ASLS-fitted baseline for filtered_data [original data units]
+%   t_filtered = time vector for filtered_data and y_baseline [sec]
+%   fs_filtered = sample rate for filtered_data and y_baseline [Hz]
 
     %% parse inputs
 
@@ -59,7 +67,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
         error('the variable `data` in filepath must be a 1xn array of doubles');
     end
 
-    [all_out, ~, ~, outcols, outunits, rec_des] = ...
+    [all_out, ~, ~, outcols, outunits, rec_des, filtered_data, y_baseline, t_filtered, fs_filtered] = ...
         mNPS_readJOVE(data, sampleRate, ch_height, De_np, wC, thresholds, false, false, ASLS_param);
 
     %% remove duplicate files to read
@@ -101,7 +109,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
                 end
 
                 % measure a new pulse
-                [iter_out, emptyflag] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, wC, new_th, false, false, ASLS_param);
+                [iter_out, emptyflag, ~,~,~,~,~,~,~,~] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, wC, new_th, false, false, ASLS_param);
                 % iter_out: output of one iteration
                 % emptyflag: skip pulse if TRUE
                 % auto: values for computing auto-threshold value
@@ -115,7 +123,7 @@ function output_table = mNPS_procJOVE(filepath, ch_height, De_np, wC, thresholds
                     i = i+1;
                     searchflag = true;
                 else
-                    [iter_out, ~, auto] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, wC, new_th, true, true, ASLS_param);
+                    [iter_out, ~, auto, ~,~,~,~,~,~,~] = mNPS_readJOVE(iterdata, sampleRate, ch_height, De_np, wC, new_th, true, true, ASLS_param);
                     searchflag = false;
                 end
 

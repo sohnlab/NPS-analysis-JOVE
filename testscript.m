@@ -28,8 +28,12 @@ De_np = 2 * ch_height * w_NP / (ch_height + w_NP); % effective diameter estimate
 ASLS_param = struct('lambda',1e10, 'p',0, 'noise_margin',2.4e-4, 'max_iter',40);
 thresholds = [1e-4, 5e-4];
 
-out_j12 = mNPS_procJOVE(filepath_JOVE12, ch_height, De_np, wC, thresholds, fs, ASLS_param);
+[out_j12, ~,~,~,~] = mNPS_procJOVE(filepath_JOVE12, ch_height, De_np, wC, thresholds, fs, ASLS_param);
 out_j12 = remove_duplicate_rows(out_j12);
+
+% % if you want to get the preprocessed data as well
+% [out_j12, filtered_data_j12, y_baseline_j12, t_filtered_j12, fs_filtered_j12] = ...
+%     mNPS_procJOVE(filepath_JOVE12, ch_height, De_np, wC, thresholds, fs, ASLS_param);
 
 %% 06/16/2022 (BEAS2B, wC=10)
 
@@ -45,5 +49,5 @@ out_j12 = remove_duplicate_rows(out_j12);
 % thresholds = [0.9e-4, 4e-4];
 % eventlength_filt = 3000;
 % 
-% out_j10c = mNPS_procJOVE(filepath_JOVE10c, ch_height, De_np, wC, thresholds, fs, ASLS_param, eventlength_filt);
+% [out_j10c, ~,~,~,~] = mNPS_procJOVE(filepath_JOVE10c, ch_height, De_np, wC, thresholds, fs, ASLS_param, eventlength_filt);
 % out_j10c = remove_duplicate_rows(out_j10c);

@@ -20,23 +20,27 @@ Kim, J., Han, S., Lei, A. *et al.* Characterizing cellular mechanical phenotypes
 ### output of `mNPS_procJOVE()`
 * `output_table` = _n_ x 19 table, where _n_ is the number of processed cell events
 	* units of each column: `output_table.Properties.VariableUnits`
-* `output_table.diameter` = cell diameter [µm]
-* `output_table.def_diameter` = transverse diameter of the cell in the contraction segment [µm]
-	* transverse deformation is defined as `def_diameter/diameter`
-* `output_table.wCDI` = whole-cell deformability index
-	* dimensionless measure of resistance to deformation
-	* _wCDI_ has an inverse relationship to Young's modulus
-* `output_table.rec_cat` = the first segment where the cell was fully recovered after deformation [categorical]
-	* "recovery" is defined as the current pulse returning to its pre-deformation amplitude, within 8% tolerance
-	* `0` = the cell was already recovered by the first recovery segment
-	* `1` = the cell did not recover until the second recovery segment
-	* `2` = the cell did not recover until the third recovery segment
-	* `Inf` = the cell did not recover within the NPS channel
-* `output_table.rec_time` = time for the cell to recover after deformation [ms]
-	* elapsed time between the cell exiting the contraction segment and entering the first segment where it was recovered
-	* "recovery" is defined as the current pulse returning to its pre-deformation amplitude, within 8% tolerance
-	* although this is reported as a continuous value, it is discretized for each cell by the three recovery segments
-	* cells that did not recover within the NPS channel have a recovery time of `Inf`
+	* `output_table.diameter` = cell diameter [µm]
+	* `output_table.def_diameter` = transverse diameter of the cell in the contraction segment [µm]
+		* transverse deformation is defined as `def_diameter/diameter`
+	* `output_table.wCDI` = whole-cell deformability index
+		* dimensionless measure of resistance to deformation
+		* _wCDI_ has an inverse relationship to Young's modulus
+	* `output_table.rec_cat` = the first segment where the cell was fully recovered after deformation [categorical]
+		* "recovery" is defined as the current pulse returning to its pre-deformation amplitude, within 8% tolerance
+		* `0` = the cell was already recovered by the first recovery segment
+		* `1` = the cell did not recover until the second recovery segment
+		* `2` = the cell did not recover until the third recovery segment
+		* `Inf` = the cell did not recover within the NPS channel
+	* `output_table.rec_time` = time for the cell to recover after deformation [ms]
+		* elapsed time between the cell exiting the contraction segment and entering the first segment where it was recovered
+		* "recovery" is defined as the current pulse returning to its pre-deformation amplitude, within 8% tolerance
+		* although this is reported as a continuous value, it is discretized for each cell by the three recovery segments
+		* cells that did not recover within the NPS channel have a recovery time of `Inf`
+* `filtered_data` = data smoothed, downsampled, LPF [original data units]
+* `y_baseline` = ASLS-fitted baseline for `filtered_data` [original data units]
+* `t_filtered` = time vector for `filtered_data` and `y_baseline` [sec]
+* `fs_filtered` = sample rate for `filtered_data` and `y_baseline` [Hz]
 
 #### example data:
 
