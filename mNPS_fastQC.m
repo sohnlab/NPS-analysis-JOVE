@@ -1,7 +1,7 @@
-function [y_smoothed, y_downsampled, y_baseline, y_detrended] = mNPS_fastQC(data, sampleRate, k_sample, detrend_flag, filt_flag, ASLS_param)
+function [y_smoothed, y_downsampled, y_baseline, y_detrended] = mNPS_fastQC(data, sampleRate, N, detrend_flag, filt_flag, ASLS_param)
 % Fast option for post-processing mNPS signal.
 %   default sampleRate = 50000 [Hz]
-%   default k_sample (downsample factor) = 20
+%   default N (downsample factor) = 20
 %   optional bool detrend_flag to perform baseline subtraction (default=false)
 %   optional bool filt_flag to enable 60 Hz bandstop filter (default=false)
 %   optional struct ASLS_param (baseline fitting parameters passed to ASLS.m)
@@ -27,8 +27,8 @@ function [y_smoothed, y_downsampled, y_baseline, y_detrended] = mNPS_fastQC(data
         detrend_flag = false;
     end
 
-    if nargin<3 || isempty(k_sample)
-        k_sample = 20; % to downsample from 50 kHz to 2.5 kHz
+    if nargin<3 || isempty(N)
+        N = 20; % to downsample from 50 kHz to 2.5 kHz
     end
 
     if nargin<2 || isempty(sampleRate)
@@ -63,7 +63,7 @@ function [y_smoothed, y_downsampled, y_baseline, y_detrended] = mNPS_fastQC(data
     end
     
     % downsample by period N
-    y_downsampled = downsample(y_smoothed,k_sample);
+    y_downsampled = downsample(y_smoothed,N);
     
     % subtract baseline if desired
     if detrend_flag
